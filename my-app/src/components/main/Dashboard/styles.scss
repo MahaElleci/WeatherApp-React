@@ -9,6 +9,18 @@
         color: #fff; 
         margin: 0 auto;
         padding: 2rem;
-    } 
+    }  
+    &__locations {
+        display: flex; 
+        justify-content: center; 
+        margin-top: 5rem;  
+        &:hover{
+            cursor: pointer;
+        }
+        p{
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+    }
  
 }

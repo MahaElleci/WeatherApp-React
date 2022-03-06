@@ -13,8 +13,7 @@ export const WeatherPlaceholder: FC<IProps> = ({location, temprature, icon}) => 
     <div className="weather-placeholder">
         <p>{location}</p> 
         <div id="icon"><img id="wicon" src={icon} alt="Weather icon"/></div> 
-        <p>{temprature} C°</p> 
+        <p>{temprature}</p> 
     </div>
   );
-}; 
-
+};

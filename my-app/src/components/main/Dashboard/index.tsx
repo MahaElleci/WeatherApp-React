@@ -1,12 +1,70 @@
-import { FC } from "react";
+import { FC, SetStateAction, useEffect, useState } from "react";
 
+import { WeatherPlaceholder } from "../../shared/WeatherPlaceholder";
+import { getWeather } from "../../../services/weather-apis";
+
+import { MainWeatherConditions } from "../../../models/Weather";
 import "./styles.scss";
 interface IProps {}
 
 export const Dashboard: FC<IProps> = () => {
+  const [locationsWeather, setLocationsWeather] = useState<
+    MainWeatherConditions[] | null
+  >(null);
+
+  let locations: MainWeatherConditions[] = [];
+
+  const getDashboardData = () => {
+    const requests = [
+      {
+        displayName: "Berlin",
+        coordinates: { lon: 13.404954, lat: 52.520008 },
+      },
+      { displayName: "Iceland", coordinates: { lon: 19.0208, lat: 64.9631 } },
+    ];
+    Promise.all(requests.map((request) => getWeather(request.coordinates)))
+      .then((responses) => {
+        return Promise.all(
+          responses.map(function (response) {
+            return response.json();
+          })
+        );
+      })
+      .then((data) => {
+        data.forEach((location, index) => {
+          locations.push({
+            id: location["weather"][0].id,
+            location: requests[index].displayName,
+            main: location["weather"][0].main,
+            temp: location["main"].temp,
+            icon: location["weather"][0].icon,
+          });
+        });
+        setLocationsWeather(locations);
+      });
+  };
+  useEffect(() => {
+    getDashboardData();
+  }, []);
+
   return (
     <div className="dashboard-wrapper">
       <h1>"Coolest" 🥶🌡️ Weather App</h1>
+      <div className="dashboard-wrapper__locations">
+        {locationsWeather &&
+          locationsWeather.map((item,index) => {
+            var iconurl =
+              "http://openweathermap.org/img/w/" + item.icon + ".png";
+            return (
+              <WeatherPlaceholder
+                key={index}
+                location={item.location}
+                temprature={item.temp}
+                icon={iconurl}
+              />
+            );
+          })}
+      </div>
     </div>
   );
 };
