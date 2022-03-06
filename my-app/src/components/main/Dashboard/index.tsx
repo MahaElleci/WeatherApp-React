@@ -12,10 +12,18 @@ export const Dashboard: FC<IProps> = () => {
     MainWeatherConditions[] | null
   >(null);
 
-  let locations: MainWeatherConditions[] = [];
+  let locations: MainWeatherConditions[] = []; 
 
+  const getCurrentLocation = () => { 
+    let currentLocation = {lon: 0, lat:0}
+     navigator.geolocation.getCurrentPosition((position) => { 
+      currentLocation = {lon : position.coords.longitude, lat: position.coords.latitude}
+    })  
+    return currentLocation;
+  }
   const getDashboardData = () => {
-    const requests = [
+    const requests = [ 
+      { displayName: "My Location", coordinates: getCurrentLocation()},
       {
         displayName: "Berlin",
         coordinates: { lon: 13.404954, lat: 52.520008 },
@@ -36,7 +44,7 @@ export const Dashboard: FC<IProps> = () => {
             id: location["weather"][0].id,
             location: requests[index].displayName,
             main: location["weather"][0].main,
-            temp: location["main"].temp,
+            temp: Math.ceil(location["main"].temp),
             icon: location["weather"][0].icon,
           });
         });
