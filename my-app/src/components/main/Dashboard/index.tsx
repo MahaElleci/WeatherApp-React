@@ -12,18 +12,21 @@ export const Dashboard: FC<IProps> = () => {
     MainWeatherConditions[] | null
   >(null);
 
-  let locations: MainWeatherConditions[] = []; 
+  let locations: MainWeatherConditions[] = [];
 
-  const getCurrentLocation = () => { 
-    let currentLocation = {lon: 0, lat:0}
-     navigator.geolocation.getCurrentPosition((position) => { 
-      currentLocation = {lon : position.coords.longitude, lat: position.coords.latitude}
-    })  
+  const getCurrentLocation = () => {
+    let currentLocation = { lon: 0, lat: 0 };
+    navigator.geolocation.getCurrentPosition((position) => {
+      currentLocation = {
+        lon: position.coords.longitude,
+        lat: position.coords.latitude,
+      };
+    });
     return currentLocation;
-  }
+  };
   const getDashboardData = () => {
-    const requests = [ 
-      { displayName: "My Location", coordinates: getCurrentLocation()},
+    const requests = [
+      { displayName: "My Location", coordinates: getCurrentLocation() },
       {
         displayName: "Berlin",
         coordinates: { lon: 13.404954, lat: 52.520008 },
@@ -46,6 +49,8 @@ export const Dashboard: FC<IProps> = () => {
             main: location["weather"][0].main,
             temp: Math.ceil(location["main"].temp),
             icon: location["weather"][0].icon,
+            details: location["main"],
+            sys: location["sys"],
           });
         });
         setLocationsWeather(locations);
@@ -60,15 +65,19 @@ export const Dashboard: FC<IProps> = () => {
       <h1>"Coolest" 🥶🌡️ Weather App</h1>
       <div className="dashboard-wrapper__locations">
         {locationsWeather &&
-          locationsWeather.map((item,index) => {
+          locationsWeather.map((item, index) => {
             var iconurl =
               "http://openweathermap.org/img/w/" + item.icon + ".png";
             return (
               <WeatherPlaceholder
                 key={index}
+                id={item.id}
                 location={item.location}
                 temprature={item.temp}
                 icon={iconurl}
+                main={item.main}
+                details={item.details}
+                sys={item.sys}
               />
             );
           })}
