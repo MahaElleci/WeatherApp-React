@@ -4,7 +4,7 @@ import { WeatherPlaceholder } from "../../shared/WeatherPlaceholder";
 import { getWeather } from "../../../services/weather-apis";
 
 import { Spinner } from "../../shared/spinner";
-import { MainWeatherConditions } from "../../../models/Weather";
+import { Coordinates, MainWeatherConditions } from "../../../models/Weather";
 import "./styles.scss";
 interface IProps {}
 
@@ -13,7 +13,11 @@ export const Dashboard: FC<IProps> = () => {
     MainWeatherConditions[] | null
   >(null);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState<Coordinates>({
+    lon: 0,
+    lat: 0,
+  });
   const [errorMessage, setErrorMessage] = useState({
     show: false,
     message: "",
@@ -22,18 +26,35 @@ export const Dashboard: FC<IProps> = () => {
   let locations: MainWeatherConditions[] = [];
 
   const getCurrentLocation = () => {
-    let currentLocation = { lon: 0, lat: 0 };
-    navigator.geolocation.getCurrentPosition((position) => {
-      currentLocation = {
-        lon: position.coords.longitude,
-        lat: position.coords.latitude,
-      };
-    });
-    return currentLocation;
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCurrentLocation({
+          lon: position.coords.longitude,
+          lat: position.coords.latitude,
+        });
+        localStorage.setItem("authorizedGeoLocation", "true");
+      },
+      () => {
+        localStorage.setItem("authorizedGeoLocation", "false");
+      }
+    );
+  };
+
+  const nonAuthorizedLocation = () => {
+    if (
+      typeof localStorage.getItem("authorizedGeoLocation") == "undefined" ||
+      localStorage.getItem("authorizedGeoLocation") == "false"
+    ) {
+      return true;
+    } else return false;
   };
   const getDashboardData = () => {
+    setLoading(true);
     const requests = [
-      { displayName: "My Location", coordinates: getCurrentLocation() },
+      {
+        displayName: "My Location",
+        coordinates: currentLocation,
+      },
       {
         displayName: "Berlin",
         coordinates: { lon: 13.404954, lat: 52.520008 },
@@ -54,6 +75,10 @@ export const Dashboard: FC<IProps> = () => {
       })
       .then((data) => {
         setLoading(false);
+        setErrorMessage({
+          show: false,
+          message: "",
+        });
         data.forEach((location, index) => {
           locations.push({
             id: location["weather"][0].id,
@@ -69,35 +94,45 @@ export const Dashboard: FC<IProps> = () => {
       })
       .catch((error) => {
         setLoading(false);
-        if (error === 401)
-          setErrorMessage({
-            show: true,
-            message: "Unauthorized access. Please check your OpenWeather key.",
-          });
-        else
-          setErrorMessage({
-            show: true,
-            message: "Sorry there is a network issue ...",
-          });
+        if (!errorMessage.show) {
+          if (error === 401)
+            setErrorMessage({
+              show: true,
+              message:
+                "Unauthorized access. Please check your OpenWeather key.",
+            });
+          else if (error === 429)
+            setErrorMessage({
+              show: true,
+              message: "You exceeded number of requests to OpenWeather.",
+            });
+          else
+            setErrorMessage({
+              show: true,
+              message: "Sorry there is a network issue ...",
+            });
+        }
       });
   };
   useEffect(() => {
-    getDashboardData();
+    getCurrentLocation();
+    nonAuthorizedLocation()
+      ? setErrorMessage({
+          show: true,
+          message:
+            "Please enable browser's location service and refresh the page",
+        })
+      : getDashboardData();
   }, []);
 
   return (
     <div className="dashboard-wrapper">
       <h1>"Coolest" 🥶🌡️ Weather App</h1>
       <div className="dashboard-wrapper__locations">
-        {errorMessage.show && (
-          <div className="error-message">
-           <i className="material-icons">&#xe001;</i>
-            {errorMessage.message}
-          </div>
-        )}
         {loading ? (
           <Spinner />
         ) : (
+          !nonAuthorizedLocation() &&
           locationsWeather &&
           locationsWeather.map((item, index) => {
             var iconurl =
@@ -115,6 +150,12 @@ export const Dashboard: FC<IProps> = () => {
               />
             );
           })
+        )}
+        {errorMessage.show && (
+          <div className="error-message">
+            <i className="material-icons">&#xe001;</i>
+            {errorMessage.message}
+          </div>
         )}
       </div>
     </div>
