@@ -1,8 +1,9 @@
-import { FC, SetStateAction, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 
 import { WeatherPlaceholder } from "../../shared/WeatherPlaceholder";
 import { getWeather } from "../../../services/weather-apis";
 
+import { Spinner } from "../../shared/spinner";
 import { MainWeatherConditions } from "../../../models/Weather";
 import "./styles.scss";
 interface IProps {}
@@ -11,6 +12,8 @@ export const Dashboard: FC<IProps> = () => {
   const [locationsWeather, setLocationsWeather] = useState<
     MainWeatherConditions[] | null
   >(null);
+
+  const [loading, setLoading] = useState(true);
 
   let locations: MainWeatherConditions[] = [];
 
@@ -42,6 +45,7 @@ export const Dashboard: FC<IProps> = () => {
         );
       })
       .then((data) => {
+        setLoading(false);
         data.forEach((location, index) => {
           locations.push({
             id: location["weather"][0].id,
@@ -64,7 +68,10 @@ export const Dashboard: FC<IProps> = () => {
     <div className="dashboard-wrapper">
       <h1>"Coolest" 🥶🌡️ Weather App</h1>
       <div className="dashboard-wrapper__locations">
-        {locationsWeather &&
+        {loading ? (
+          <Spinner />
+        ) : (
+          locationsWeather &&
           locationsWeather.map((item, index) => {
             var iconurl =
               "http://openweathermap.org/img/w/" + item.icon + ".png";
@@ -80,7 +87,8 @@ export const Dashboard: FC<IProps> = () => {
                 sys={item.sys}
               />
             );
-          })}
+          })
+        )}
       </div>
     </div>
   );
