@@ -14,6 +14,10 @@ export const Dashboard: FC<IProps> = () => {
   >(null);
 
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState({
+    show: false,
+    message: "",
+  });
 
   let locations: MainWeatherConditions[] = [];
 
@@ -39,7 +43,11 @@ export const Dashboard: FC<IProps> = () => {
     Promise.all(requests.map((request) => getWeather(request.coordinates)))
       .then((responses) => {
         return Promise.all(
-          responses.map(function (response) {
+          responses.map(async (response) => {
+            if (!response.ok) {
+              const error = response.status;
+              return Promise.reject(error);
+            }
             return response.json();
           })
         );
@@ -58,6 +66,19 @@ export const Dashboard: FC<IProps> = () => {
           });
         });
         setLocationsWeather(locations);
+      })
+      .catch((error) => {
+        setLoading(false);
+        if (error === 401)
+          setErrorMessage({
+            show: true,
+            message: "Unauthorized access. Please check your OpenWeather key.",
+          });
+        else
+          setErrorMessage({
+            show: true,
+            message: "Sorry there is a network issue ...",
+          });
       });
   };
   useEffect(() => {
@@ -68,6 +89,12 @@ export const Dashboard: FC<IProps> = () => {
     <div className="dashboard-wrapper">
       <h1>"Coolest" 🥶🌡️ Weather App</h1>
       <div className="dashboard-wrapper__locations">
+        {errorMessage.show && (
+          <div className="error-message">
+           <i className="material-icons">&#xe001;</i>
+            {errorMessage.message}
+          </div>
+        )}
         {loading ? (
           <Spinner />
         ) : (
