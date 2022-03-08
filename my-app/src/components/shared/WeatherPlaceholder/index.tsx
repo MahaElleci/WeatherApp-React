@@ -32,7 +32,8 @@ export const WeatherPlaceholder: FC<IProps> = ({
     <Link
       to={`/details/${id}`}
       state={{ locationName: location, details: detailsObj, icon: icon }}
-      className="weather-placeholder"
+      className="weather-placeholder" 
+      data-testid="weather-element" 
     >
       <p>{location}</p>
       <div id="icon">

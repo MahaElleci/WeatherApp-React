@@ -44,7 +44,8 @@ export const WeatherDetails: FC<IWeatherDetailsProps> = () => {
   }, []);
   return (
     <div className="weatherDetails-wrapper">
-      <h3>{locationName}</h3>
+      <h3>{locationName}</h3> 
+
       <div className="back-btn" onClick={() => navigate("/")}></div>
       <div className="weatherDetails-wrapper__info">
         {loading ? (

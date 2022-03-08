@@ -24,6 +24,18 @@ export const Dashboard: FC<IProps> = () => {
   });
 
   let locations: MainWeatherConditions[] = [];
+  
+  const dashboardRequests = [
+    {
+      displayName: "My Location",
+      coordinates: currentLocation,
+    },
+    {
+      displayName: "Berlin",
+      coordinates: { lon: 13.404954, lat: 52.520008 },
+    },
+    { displayName: "Iceland", coordinates: { lon: 19.0208, lat: 64.9631 } },
+  ]; 
 
   const getCurrentLocation = () => {
     navigator.geolocation.getCurrentPosition(
@@ -48,33 +60,24 @@ export const Dashboard: FC<IProps> = () => {
       return true;
     } else return false;
   };
-  const getDashboardData = () => {
+  const getDashboardData = (isCancelled: boolean) => {
     setLoading(true);
-    const requests = [
-      {
-        displayName: "My Location",
-        coordinates: currentLocation,
-      },
-      {
-        displayName: "Berlin",
-        coordinates: { lon: 13.404954, lat: 52.520008 },
-      },
-      { displayName: "Iceland", coordinates: { lon: 19.0208, lat: 64.9631 } },
-    ];
-    Promise.all(requests.map((request) => getWeather(request.coordinates)))
+    Promise.all(dashboardRequests.map((request) => getWeather(request.coordinates)))
       .then((responses) => {
         return Promise.all(
           responses.map(async (response) => {
             if (!response.ok) {
               const error = response.status;
               return Promise.reject(error);
-            }
+            } 
+            if (!isCancelled)
             return response.json();
           })
         );
       })
       .then((data) => {
-        setLoading(false);
+        setLoading(false); 
+        if (!isCancelled){
         setErrorMessage({
           show: false,
           message: "",
@@ -82,7 +85,7 @@ export const Dashboard: FC<IProps> = () => {
         data.forEach((location, index) => {
           locations.push({
             id: location["weather"][0].id,
-            location: requests[index].displayName,
+            location: dashboardRequests[index].displayName,
             main: location["weather"][0].main,
             temp: Math.ceil(location["main"].temp),
             icon: location["weather"][0].icon,
@@ -90,11 +93,13 @@ export const Dashboard: FC<IProps> = () => {
             sys: location["sys"],
           });
         });
-        setLocationsWeather(locations);
-      })
+        setLocationsWeather(locations); 
+      }
+      }) 
+    
       .catch((error) => {
-        setLoading(false);
-        if (!errorMessage.show) {
+        setLoading(false); 
+        if (!errorMessage.show && !isCancelled) {
           if (error === 401)
             setErrorMessage({
               show: true,
@@ -114,7 +119,8 @@ export const Dashboard: FC<IProps> = () => {
         }
       });
   };
-  useEffect(() => {
+  useEffect(() => { 
+    let isCancelled = false;
     getCurrentLocation();
     nonAuthorizedLocation()
       ? setErrorMessage({
@@ -122,7 +128,10 @@ export const Dashboard: FC<IProps> = () => {
           message:
             "Please enable browser's location service and refresh the page",
         })
-      : getDashboardData();
+      : getDashboardData(isCancelled); 
+      return () => {
+        isCancelled = true;
+      };
   }, []);
 
   return (
