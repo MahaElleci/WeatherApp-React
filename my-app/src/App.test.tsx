@@ -26,7 +26,7 @@ it("API returns default cities", async () => {
 
   await waitFor(() => {
     expect(getByText("Berlin")).toBeInTheDocument();
-    expect(getByText("Iceland")).toBeInTheDocument();
+    expect(getByText("Reykjavík")).toBeInTheDocument();
   });
 }); 
 

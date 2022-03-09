@@ -11,7 +11,8 @@ interface IProps {
   icon: string;
   main: string;
   details: WeatherDetailsData;
-  sys: object;
+  sys: object; 
+  unit: string;
 }
 
 export const WeatherPlaceholder: FC<IProps> = ({
@@ -21,7 +22,8 @@ export const WeatherPlaceholder: FC<IProps> = ({
   icon,
   main,
   details,
-  sys,
+  sys, 
+  unit
 }) => {
   const detailsObj = {
     tempDetails: details,
@@ -31,7 +33,7 @@ export const WeatherPlaceholder: FC<IProps> = ({
   return (
     <Link
       to={`/details/${id}`}
-      state={{ locationName: location, details: detailsObj, icon: icon }}
+      state={{ locationName: location, details: detailsObj, icon: icon, unit:unit }}
       className="weather-placeholder" 
       data-testid="weather-element" 
     >
@@ -40,7 +42,7 @@ export const WeatherPlaceholder: FC<IProps> = ({
         <img id="wicon" src={icon} alt="Weather icon" />
       </div>
       <div className="weather-placeholder__temp">
-        <span>{temprature} C°</span>
+        <span>{temprature} {unit === "metric" ? "°C" : "°F"}</span>
         <span>{main}</span>
       </div>
     </Link>

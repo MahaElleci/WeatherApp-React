@@ -157,7 +157,8 @@ export const Dashboard: FC<IProps> = () => {
                 icon={iconurl}
                 main={item.main}
                 details={item.details}
-                sys={item.sys}
+                sys={item.sys} 
+                unit={selectedUnit}
               />
             );
           })

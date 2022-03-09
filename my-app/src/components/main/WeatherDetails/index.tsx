@@ -17,14 +17,15 @@ interface LocationState {
       };
       condition: string;
     };
-    icon: string;
+    icon: string; 
+    unit :string;
   };
 }
 
 export const WeatherDetails: FC<IWeatherDetailsProps> = () => {
   const location = useLocation() as unknown as LocationState;
   const navigate = useNavigate();
-  const { locationName, details, icon } = location.state;
+  const { locationName, details, icon, unit } = location.state;
   const [loading, setLoading] = useState(true);
 
   const convertToTime = (s: number) => {
@@ -58,21 +59,21 @@ export const WeatherDetails: FC<IWeatherDetailsProps> = () => {
                 <img id="wicon" src={icon} alt="Weather icon" />
               </span>
               <span className="temprature">
-                {Math.ceil(details.tempDetails.temp)} C°
+                {Math.ceil(details.tempDetails.temp)} {unit === "metric" ? "°C" : "°F"}
               </span>
               <div className="hi-lo-temprature">
                 <span>
-                  Lowest: {Math.ceil(details.tempDetails.temp_min)} C°
+                  Lowest: {Math.ceil(details.tempDetails.temp_min)} {unit === "metric" ? "°C" : "°F"}
                 </span>
                 <span>
-                  Heighest: {Math.ceil(details.tempDetails.temp_max)} C°
+                  Heighest: {Math.ceil(details.tempDetails.temp_max)} {unit === "metric" ? "°C" : "°F"}
                 </span>
               </div>
             </div>
 
             <div className="weatherDetails-wrapper__info__details">
               <div>
-                <span>Humidity</span>
+                <span>Humidity </span> 
                 <p>{details.tempDetails.humidity} %</p>
               </div>
               <div>
