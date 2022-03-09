@@ -13,14 +13,15 @@ export const Dashboard: FC<IProps> = () => {
     MainWeatherConditions[] | null
   >(null);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); 
+  const [selectedUnit, setSelectedUnit] = useState("metric");
   const [currentLocation, setCurrentLocation] = useState<Coordinates>({
     lon: 0,
     lat: 0,
   });
   const [errorMessage, setErrorMessage] = useState({
     show: false,
-    message: "",
+    message: ""
   });
 
   let locations: MainWeatherConditions[] = [];
@@ -34,7 +35,7 @@ export const Dashboard: FC<IProps> = () => {
       displayName: "Berlin",
       coordinates: { lon: 13.404954, lat: 52.520008 },
     },
-    { displayName: "Iceland", coordinates: { lon: 19.0208, lat: 64.9631 } },
+    { displayName: "Reykjavík", coordinates: { lon: 19.0208, lat: 64.9631 } },
   ]; 
 
   const getCurrentLocation = () => {
@@ -60,9 +61,9 @@ export const Dashboard: FC<IProps> = () => {
       return true;
     } else return false;
   };
-  const getDashboardData = (isCancelled: boolean) => {
+  const getDashboardData = (isCancelled: boolean, unit: string) => {
     setLoading(true);
-    Promise.all(dashboardRequests.map((request) => getWeather(request.coordinates)))
+    Promise.all(dashboardRequests.map((request) => getWeather(request.coordinates, unit)))
       .then((responses) => {
         return Promise.all(
           responses.map(async (response) => {
@@ -80,7 +81,7 @@ export const Dashboard: FC<IProps> = () => {
         if (!isCancelled){
         setErrorMessage({
           show: false,
-          message: "",
+          message: ""
         });
         data.forEach((location, index) => {
           locations.push({
@@ -92,9 +93,9 @@ export const Dashboard: FC<IProps> = () => {
             details: location["main"],
             sys: location["sys"],
           });
-        });
+        }); 
         setLocationsWeather(locations); 
-      }
+      } 
       }) 
     
       .catch((error) => {
@@ -120,27 +121,28 @@ export const Dashboard: FC<IProps> = () => {
       });
   };
   useEffect(() => { 
-    let isCancelled = false;
+    let isCancelled = false; 
     getCurrentLocation();
     nonAuthorizedLocation()
       ? setErrorMessage({
           show: true,
           message:
-            "Please enable browser's location service and refresh the page",
+            "Please enable browser's location service and refresh the page.",
         })
-      : getDashboardData(isCancelled); 
+      : getDashboardData(isCancelled, selectedUnit)
       return () => {
         isCancelled = true;
-      };
-  }, []);
+      }; 
+    
+  }, [selectedUnit]);
 
   return (
     <div className="dashboard-wrapper">
       <h1>"Coolest" 🥶🌡️ Weather App</h1>
-      <div className="dashboard-wrapper__locations">
+      <div className="dashboard-wrapper__locations"> 
         {loading ? (
           <Spinner />
-        ) : (
+        ) : (  
           !nonAuthorizedLocation() &&
           locationsWeather &&
           locationsWeather.map((item, index) => {
@@ -159,14 +161,19 @@ export const Dashboard: FC<IProps> = () => {
               />
             );
           })
-        )}
+        )} 
         {errorMessage.show && (
           <div className="error-message">
             <i className="material-icons">&#xe001;</i>
-            {errorMessage.message}
+            {errorMessage.message} 
           </div>
         )}
-      </div>
+      </div> 
+      <div className="dashboard-wrapper__switcher"> 
+           <span>Switch Unit</span> 
+           <button className={selectedUnit === "standard" ? "btn btn--active" : "btn"} onClick={() => setSelectedUnit("standard")}>Standard</button> 
+           <button className={selectedUnit === "metric" ? "btn btn--active" : "btn"}  onClick={() => setSelectedUnit("metric")}> Metric</button>
+            </div>
     </div>
   );
 };

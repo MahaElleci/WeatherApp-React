@@ -1,38 +1,39 @@
 .weatherDetails-wrapper {
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
   position: relative;
   height: 100vh;
   h3 {
     color: #fff;
     margin: 0 auto;
-    padding: 2rem; 
-    font-size: 3rem; 
+    padding: 2rem;
+    font-size: 3rem;
     margin-bottom: 2rem;
-  } 
+  }
   .back-btn {
     border: solid #fff;
     border-width: 0 3px 3px 0;
     display: inline-block;
-    padding: 3px; 
-    transform: rotate(135deg); 
-    position: absolute; 
+    padding: 3px;
+    transform: rotate(135deg);
+    position: absolute;
     padding: 0.5rem;
-    margin: 4rem; 
+    margin: 4rem;
     &:hover {
-        cursor: pointer;
-        opacity: 0.8;
+      cursor: pointer;
+      opacity: 0.8;
     }
   }
   &__info {
     display: flex;
-    margin: 0 auto;
+    margin: 0 2rem; 
+    flex-wrap: wrap; 
+    justify-content: space-around;
     &__temp {
       display: flex;
-      flex-direction: column; 
-      align-items: center;
-      padding: 4rem; 
-      margin: 1rem 4rem;
+      flex-direction: column;
+      align-items: center; 
+      text-align: center; 
       span {
         margin-bottom: 1rem;
       }
@@ -45,33 +46,34 @@
       }
       .hi-lo-temprature {
         display: flex;
-        font-size: 1.5rem; 
+        font-size: 1.5rem;
         span {
-            margin-right: 1rem;
+          margin-right: 1rem;
         }
       }
     }
     &__details {
-      display: grid;
-      grid-template-columns: auto auto;
-      box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;   
-      background-color: rgba(255, 255, 255, 0.5);  
-      margin: 1rem 4rem;
-      div { 
+      display: flex;
+      align-items: center; 
+      flex-wrap: wrap;
+      box-shadow: #26394d 0px 20px 30px -10px;
+      background-color: rgba(255, 255, 255, 0.5);
+      div {
         display: flex;
-        flex-direction: column;  
-        margin: 1rem 2rem;  
-        align-items: center; 
-        padding: 2rem;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem 0;
+        width: 100%;
         span {
-            font-size: 1.5rem;
-            font-weight: 800; 
-            margin-bottom: 0.5rem; 
-        } 
+          font-size: 1.5rem;
+          font-weight: 800;
+          margin-bottom: 0.5rem;
+        }
         p {
-            font-size: 1.2rem; 
+          font-size: 1.2rem; 
+          margin: 0;
         }
       }
     }
-  } 
+  }
 }
